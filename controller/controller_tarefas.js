@@ -13,14 +13,14 @@ const tarefasDAO = require('../model/DAO/tarefa.js')
 const message = require('./modulo/config.js')
 
 // Função para listar todas as tarefas de um usuário
-const getListarTarefas = async(idUsuario) => {
+const getListarTarefas = async (idUsuario) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
     let tarefasJSON = {}
- 
+
     // Validação para ID vazio, indefinido
-    if(usuario == '' || usuario == undefined || isNaN(usuario)){
+    if (usuario == '' || usuario == undefined || isNaN(usuario)) {
 
         return message.ERROR_INVALID_ID // 400
 
@@ -29,18 +29,18 @@ const getListarTarefas = async(idUsuario) => {
         let dadosTarefas = await tarefasDAO.selectAllTarefasById(usuario)
 
         // Validação para verificar se os dados no servidor foram processados
-        if(dadosTarefas){
+        if (dadosTarefas) {
 
             // Validação para verificar se existem dados de retorno
-            if(dadosTarefas.length > 0){
-                
+            if (dadosTarefas.length > 0) {
+
                 // Montando o JSON para retornar a tarefa
                 tarefasJSON.tarefas = dadosTarefas
                 tarefasJSON.status_code = 200
                 // Retorna o JSON montado
                 return tarefasJSON
 
-            }else{
+            } else {
 
                 return message.ERROR_NOT_FOUND // 404
 
@@ -57,14 +57,14 @@ const getListarTarefas = async(idUsuario) => {
 }
 
 // Função para listar todas as tarefas não concluidas de um usuário
-const getListarTarefasNaoConcluidas = async(idUsuario) => {
+const getListarTarefasNaoConcluidas = async (idUsuario) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
     let tarefasJSON = {}
- 
+
     // Validação para ID vazio, indefinido
-    if(usuario == '' || usuario == undefined || isNaN(usuario)){
+    if (usuario == '' || usuario == undefined || isNaN(usuario)) {
 
         return message.ERROR_INVALID_ID // 400
 
@@ -73,18 +73,18 @@ const getListarTarefasNaoConcluidas = async(idUsuario) => {
         let dadosTarefas = await tarefasDAO.selectTarefasNaoConcluidasById(usuario)
 
         // Validação para verificar se os dados no servidor foram processados
-        if(dadosTarefas){
+        if (dadosTarefas) {
 
             // Validação para verificar se existem dados de retorno
-            if(dadosTarefas.length > 0){
-                
+            if (dadosTarefas.length > 0) {
+
                 // Montando o JSON para retornar a tarefa
                 tarefasJSON.tarefas = dadosTarefas
                 tarefasJSON.status_code = 200
                 // Retorna o JSON montado
                 return tarefasJSON
 
-            }else{
+            } else {
 
                 return message.ERROR_NOT_FOUND // 404
 
@@ -101,15 +101,15 @@ const getListarTarefasNaoConcluidas = async(idUsuario) => {
 }
 
 // Função para buscar uma tarefa pelo ID
-const getBuscarTarefa = async(idUsuario, idTarefa) => {
+const getBuscarTarefa = async (idUsuario, idTarefa) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
     let tarefa = idTarefa
     let tarefasJSON = {}
- 
+
     // Validação para ID vazio, indefinido
-    if(usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)){
+    if (usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)) {
 
         return message.ERROR_INVALID_ID // 400
 
@@ -118,18 +118,18 @@ const getBuscarTarefa = async(idUsuario, idTarefa) => {
         let dadosTarefas = await tarefasDAO.selectTarefaById(usuario, tarefa)
 
         // Validação para verificar se os dados no servidor foram processados
-        if(dadosTarefas){
+        if (dadosTarefas) {
 
             // Validação para verificar se existem dados de retorno
-            if(dadosTarefas.length > 0){
-                
+            if (dadosTarefas.length > 0) {
+
                 // Montando o JSON para retornar a tarefa
                 tarefasJSON.tarefa = dadosTarefas
                 tarefasJSON.status_code = 200
                 // Retorna o JSON montado
                 return tarefasJSON
 
-            }else{
+            } else {
 
                 return message.ERROR_NOT_FOUND // 404
 
@@ -145,15 +145,151 @@ const getBuscarTarefa = async(idUsuario, idTarefa) => {
 
 }
 
+// função para listar todas as tarefas privadas de um usuario
+const getTarefasPrivadas = async (idUsuario) => {
+
+    let usuario = idUsuario
+    let resultDadosTarefa = {}
+
+    // Validação para ID vazio, indefinido
+    if (usuario == '' || usuario == undefined || isNaN(usuario)) {
+
+        return message.ERROR_INVALID_ID // 400
+
+    } else {
+
+        //Envia os dados para a model inserir no BD
+        resultDadosTarefa = await tarefasDAO.selectTarefaPriv(usuario)
+
+        //Valida se o BD inseriu corretamente os dados
+        if (resultDadosTarefa)
+            return message.UPDATED_ITEM // 200
+        else
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+
+    }
+}
+
+// função para listar todas as tarefas públicas
+const getTarefasPublicas = async() => {
+
+    let tarefasJSON = {}
+
+    // Chama a função do DAO para buscar os dados do BD
+    let dadosTarefas = await tarefasDAO.selectTarefasPublicas()
+
+    // Verifica se existem dados retornados
+    if(dadosTarefas){
+
+        if(dadosTarefas.length > 0) {
+            
+            // Montando o JSON para retornar 
+            tarefasJSON.tarefas = dadosTarefas
+            tarefasJSON.quantidade = dadosTarefas.length
+            tarefasJSON.status_code = 200
+            // Retorna o JSON montado
+            return tarefasJSON
+        
+        }else{
+
+            return message.ERROR_NOT_FOUND // 404
+
+        }
+
+    }else{
+        
+        // Retorna falso quando não houver dados
+        return message.ERROR_INTERNAL_SERVER_DB // 500
+
+    }
+}
+
+// listar tarefas que um usuário deu LIKE
+const getLike = async(idUsuario) => {
+
+    let usuario = idUsuario
+
+    let resultDadosTarefa = {}
+
+    // Validação para ID vazio, indefinido
+    if (usuario == '' || usuario == undefined || isNaN(usuario)) {
+
+        return message.ERROR_INVALID_ID // 400
+
+    } else {
+
+        //Envia os dados para a model inserir no BD
+        resultDadosTarefa = await tarefasDAO.selectLike(usuario)
+
+        //Valida se o BD inseriu corretamente os dados
+        if (resultDadosTarefa)
+            return message.UPDATED_ITEM // 200
+        else
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+
+    }
+
+}
+
+// função para listar comentários
+const getComentarios = async(idTarefa) => {
+
+    let tarefa = idTarefa
+
+    // Validação para ID vazio, indefinido
+    if (tarefa == '' || tarefa == undefined || isNaN(tarefa)) {
+
+        return message.ERROR_INVALID_ID // 400
+
+    } else {
+
+        //Envia os dados para a model inserir no BD
+        resultDadosTarefa = await tarefasDAO.selectComentarios(tarefa)
+
+        //Valida se o BD inseriu corretamente os dados
+        if (resultDadosTarefa)
+            return message.UPDATED_ITEM // 200
+        else
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+
+    }
+
+}
+
+// função para listar a quatidade de likes
+const getQtLikes = async(idTarefa) => {
+
+    let tarefa = idTarefa
+
+    // Validação para ID vazio, indefinido
+    if (tarefa == '' || tarefa == undefined || isNaN(tarefa)) {
+
+        return message.ERROR_INVALID_ID // 400
+
+    } else {
+
+        //Envia os dados para a model inserir no BD
+        resultDadosTarefa = await tarefasDAO.selectComentarios(tarefa)
+
+        //Valida se o BD inseriu corretamente os dados
+        if (resultDadosTarefa)
+            return message.UPDATED_ITEM // 200
+        else
+            return message.ERROR_INTERNAL_SERVER_DB // 500
+
+    }
+
+}
+
 // Função para alterar o estado de uma tarefa como concluida
-const setConcluirTarefa = async(idUsuario, idTarefa) => {
+const setConcluirTarefa = async (idUsuario, idTarefa) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
     let tarefa = idTarefa
 
     // Validação para ID vazio, indefinido
-    if(usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)){
+    if (usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)) {
 
         return message.ERROR_INVALID_ID // 400
 
@@ -163,17 +299,17 @@ const setConcluirTarefa = async(idUsuario, idTarefa) => {
         resultDadosTarefa = await tarefasDAO.updateConcluirTarefa(usuario, tarefa)
 
         //Valida se o BD inseriu corretamente os dados
-        if(resultDadosTarefa)
+        if (resultDadosTarefa)
             return message.UPDATED_ITEM // 200
         else
             return message.ERROR_INTERNAL_SERVER_DB // 500
 
-    }    
+    }
 
 }
 
 // Função para alterar o estado de uma tarefa como não concluida
-const setTarefaNaoConcluida = async(idUsuario, idTarefa) => {
+const setTarefaNaoConcluida = async (idUsuario, idTarefa) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
@@ -181,7 +317,7 @@ const setTarefaNaoConcluida = async(idUsuario, idTarefa) => {
     let resultDadosTarefa
 
     // Validação para ID vazio, indefinido
-    if(usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)){
+    if (usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)) {
 
         return message.ERROR_INVALID_ID // 400
 
@@ -191,18 +327,18 @@ const setTarefaNaoConcluida = async(idUsuario, idTarefa) => {
         resultDadosTarefa = await tarefasDAO.updateTarefaNaoConcluida(usuario, tarefa)
 
         //Valida se o BD inseriu corretamente os dados
-        if(resultDadosTarefa)
+        if (resultDadosTarefa)
             return message.UPDATED_ITEM // 200
         else
             return message.ERROR_INTERNAL_SERVER_DB // 500
 
 
-    }    
+    }
 
 }
 
 // Função para atualizar os dados de uma tarefa
-const setAtualizarTarefa = async(idUsuario, idTarefa, objTarefa) => {
+const setAtualizarTarefa = async (idUsuario, idTarefa, objTarefa) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
@@ -211,19 +347,19 @@ const setAtualizarTarefa = async(idUsuario, idTarefa, objTarefa) => {
     let resultDadosTarefa
 
     //Validação para tratar campos obrigatórios e quantide de caracteres
-    if( tarefa.titulo == ''     || tarefa.titulo == undefined    || tarefa.titulo.length > 50        ||
-        tarefa.descricao == ''  || tarefa.descricao == undefined || tarefa.descricao.length > 65535          
-     ){
-        
+    if (tarefa.titulo == '' || tarefa.titulo == undefined || tarefa.titulo.length > 50 ||
+        tarefa.descricao == '' || tarefa.descricao == undefined || tarefa.descricao.length > 65535
+    ) {
+
         return message.ERROR_REQUIRED_FIELDS // 400
 
-     }else{
+    } else {
 
         //Envia os dados para a model inserir no BD
         resultDadosTarefa = await tarefasDAO.updateTarefaById(usuario, tarefaId, tarefa)
 
         //Valida se o BD inseriu corretamente os dados
-        if(resultDadosTarefa)
+        if (resultDadosTarefa)
             return message.UPDATED_ITEM // 200
         else
             return message.ERROR_INTERNAL_SERVER_DB // 500
@@ -233,7 +369,7 @@ const setAtualizarTarefa = async(idUsuario, idTarefa, objTarefa) => {
 }
 
 // Função para deletar uma tarefa
-const setExcluirTarefa = async(idUsuario, idTarefa) => {
+const setExcluirTarefa = async (idUsuario, idTarefa) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
@@ -241,7 +377,7 @@ const setExcluirTarefa = async(idUsuario, idTarefa) => {
     let resultDadosTarefa
 
     // Validação para ID vazio, indefinido
-    if(usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)){
+    if (usuario == '' || usuario == undefined || isNaN(usuario) || tarefa == '' || tarefa == undefined || isNaN(tarefa)) {
 
         return message.ERROR_INVALID_ID // 400
 
@@ -251,18 +387,18 @@ const setExcluirTarefa = async(idUsuario, idTarefa) => {
         resultDadosTarefa = await tarefasDAO.deleteTarefaById(usuario, tarefa)
 
         //Valida se o BD inseriu corretamente os dados
-        if(resultDadosTarefa)
+        if (resultDadosTarefa)
             return message.DELETED_ITEM // 200
         else
             return message.ERROR_INTERNAL_SERVER_DB // 500
 
 
-    }   
+    }
 
 }
 
 // Função para adicionar uma nova tarefa
-const setNovaTarefa = async(idUsuario, objTarefa) => {
+const setNovaTarefa = async (idUsuario, objTarefa) => {
 
     //Recebe o id da Tarefa e do Usuario
     let usuario = idUsuario
@@ -270,19 +406,19 @@ const setNovaTarefa = async(idUsuario, objTarefa) => {
     let resultDadosTarefa
 
     //Validação para tratar campos obrigatórios e quantide de caracteres
-    if( tarefa.titulo == ''     || tarefa.titulo == undefined    || tarefa.titulo.length > 50        ||
-        tarefa.descricao == ''  || tarefa.descricao == undefined || tarefa.descricao.length > 65535          
-     ){
-        
+    if (tarefa.titulo == '' || tarefa.titulo == undefined || tarefa.titulo.length > 50 ||
+        tarefa.descricao == '' || tarefa.descricao == undefined || tarefa.descricao.length > 65535
+    ) {
+
         return message.ERROR_REQUIRED_FIELDS // 400
 
-     }else{
+    } else {
 
         //Envia os dados para a model inserir no BD
         resultDadosTarefa = await tarefasDAO.insertTarefa(tarefa, usuario)
-        
+
         //Valida se o BD inseriu corretamente os dados
-        if(resultDadosTarefa)
+        if (resultDadosTarefa)
             return message.CREATED_ITEM // 201
         else
             return message.ERROR_INTERNAL_SERVER_DB // 500
@@ -291,7 +427,7 @@ const setNovaTarefa = async(idUsuario, objTarefa) => {
 
 }
 
-module.exports={
+module.exports = {
     getListarTarefas,
     getListarTarefasNaoConcluidas,
     getBuscarTarefa,

@@ -71,6 +71,101 @@ const selectTarefaById = async(idUsuario, idTarefa) => {
     }
 }
 
+// selecionar as tarefas privadas de um usuário
+const selectTarefaPriv = async(idUsuario) => {
+
+    try {
+
+        let sql = `select * from tbl_tarefas
+                    inner join tbl_usuarios on tbl_tarefas.usuario_id=tbl_usuarios.id
+                    where private = true 
+                    AND usuario_id = ${idUsuario}`
+
+                    let rsTarefas = await prisma.$queryRawUnsafe(sql)
+                    return rsTarefas
+
+    } catch (error) {
+  
+        return false
+
+    }
+}
+
+// listar tarefas públicas
+const selectTarefasPublicas = async() => {
+
+    try {
+        
+        let sql = `select * from tbl_tarefas where private = false`
+
+        let rsTarefas = await prisma.$queryRawUnsafe(sql)
+        return rsTarefas
+
+    } catch (error) {
+
+        return false
+        
+    }
+
+}
+
+// listar tarefas que um usuário deu like
+const selectLike = async(idUsuario) => {
+
+    try {
+        
+        let sql = `select tbl_tarefas.id from tbl_tarefas 
+                    inner join tbl_likes 
+                    on tbl_tarefas.id=tbl_likes.tarefa_id
+                    where tbl_likes.curtida = true and tbl_likes.usuario_id = ${idUsuario}`
+
+            let rsTarefas = await prisma.$queryRawUnsafe(sql)
+            return rsTarefas
+
+    } catch (error) {
+
+        return false
+        
+    }
+
+}
+
+// listar comentarios 
+const selectComentarios = async(idTarefa) => {
+
+    try {
+        
+        let sql = `select * from tbl_comentarios where tarefa_id=${idTarefa}`
+    
+        let rsTarefas = await prisma.$queryRawUnsafe(sql)
+        return rsTarefas
+
+    } catch (error) {
+        
+        return false
+
+    }
+}
+
+// selecionar quantidade de likes
+const selectQtLikes = async(idTarefa) => {
+    
+    try {
+
+        let sql = `select sum(curtida) from tbl_likes where tarefa_id = ${idTarefa}`
+
+        let rsTarefas = await prisma.$queryRawUnsafe(sql)
+        return rsTarefas
+
+    } catch (error) {
+        
+        return false
+
+    }
+
+}
+
+
 // define o estado de uma tarefa como concluida
 const updateConcluirTarefa = async(idUsuario, idTarefa) => {
 
@@ -164,11 +259,13 @@ const insertTarefa = async(tarefa, idUsuario) => {
                                         titulo,
                                         descricao,
                                         concluido,
+                                        private,
                                         usuario_id
                                         ) values (
                                             '${tarefa.titulo}',
                                             '${tarefa.descricao}',
                                             false,
+                                            '${tarefa.private}',
                                             ${idUsuario}
                                         )`
 
@@ -188,6 +285,11 @@ module.exports = {
     selectAllTarefasById,
     selectTarefasNaoConcluidasById,
     selectTarefaById,
+    selectTarefaPriv,
+    selectTarefasPublicas,
+    selectLike,
+    selectComentarios,
+    selectQtLikes, 
     updateConcluirTarefa,
     updateTarefaNaoConcluida,
     updateTarefaById,
