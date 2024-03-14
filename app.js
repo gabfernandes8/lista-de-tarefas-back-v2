@@ -42,10 +42,11 @@ app.use((request, response, next) => {
 
 /*************** IMPORTS DE ARQUIVOS E BIBLIOTECAS DO PROJETO *******************/
     const controllerTarefas = require('./controller/controller_tarefas.js')
-    const controllerUsuarios = require('./controller/controller_usuario.js')
+    const controllerUsuarios = require('./controller/controller_usuario.js');
+const { request } = require('express');
 /****************************************************************************** */
 
-app.get('/v1/lista-de-tarefas/usuarios/', cors(), async(request, response, next) => {
+app.get('/v2/lista-de-tarefas/usuarios/', cors(), async(request, response, next) => {
 
     let dadosUsuario = await controllerUsuarios.getListarUsuarios()
 
@@ -54,7 +55,7 @@ app.get('/v1/lista-de-tarefas/usuarios/', cors(), async(request, response, next)
 
 })
 
-app.get('/v1/lista-de-tarefas/usuarios/id/:email', cors(), async(request, response, next) => {
+app.get('/v2/lista-de-tarefas/usuarios/id/:email', cors(), async(request, response, next) => {
 
     let email = request.params.email
     let dadosUsuario = await controllerUsuarios.getUserIdByEmail(email)
@@ -64,7 +65,7 @@ app.get('/v1/lista-de-tarefas/usuarios/id/:email', cors(), async(request, respon
 
 })
 
-app.get('/v1/lista-de-tarefas/usuarios/:id', cors(), async(request, response, next) => {
+app.get('/v2/lista-de-tarefas/usuarios/:id', cors(), async(request, response, next) => {
 
     let id = request.params.id
     let dadosUsuario = await controllerUsuarios.getUserByID(id)
@@ -74,7 +75,7 @@ app.get('/v1/lista-de-tarefas/usuarios/:id', cors(), async(request, response, ne
 
 })
 
-app.put('/v1/lista-de-tarefas/usuario/atualizar', cors(), bodyParserJSON, async(request, response, next) => {
+app.put('/v2/lista-de-tarefas/usuario/atualizar', cors(), bodyParserJSON, async(request, response, next) => {
 
     let usuario = request.body
     let dadosUsuario = await controllerUsuarios.updateUser(usuario)
@@ -83,7 +84,7 @@ app.put('/v1/lista-de-tarefas/usuario/atualizar', cors(), bodyParserJSON, async(
     response.json(dadosUsuario)
 })
 
-app.post('/v1/lista-de-tarefas/criar-usuario', cors(), bodyParserJSON, async(request, response, next) => {
+app.post('/v2/lista-de-tarefas/criar-usuario', cors(), bodyParserJSON, async(request, response, next) => {
 
     let usuario = request.body
     let dadosUsuario = await controllerUsuarios.setNewUser(usuario)
@@ -93,7 +94,7 @@ app.post('/v1/lista-de-tarefas/criar-usuario', cors(), bodyParserJSON, async(req
 
 })
 
-app.get('/v1/lista-de-tarefas/tarefas/:id', cors(), async(request, response, next) => {
+app.get('/v2/lista-de-tarefas/tarefas/:id', cors(), async(request, response, next) => {
 
     let usuario = request.params.id
 
@@ -104,7 +105,7 @@ app.get('/v1/lista-de-tarefas/tarefas/:id', cors(), async(request, response, nex
 
 })
 
-app.get('/v1/lista-de-tarefas/tarefas/nao-concluidas/:id', cors(), async(request, response, next) => {
+app.get('/v2/lista-de-tarefas/tarefas/nao-concluidas/:id', cors(), async(request, response, next) => {
 
     let usuario = request.params.id
 
@@ -115,7 +116,7 @@ app.get('/v1/lista-de-tarefas/tarefas/nao-concluidas/:id', cors(), async(request
 
 })
 
-app.get('/v1/lista-de-tarefas/tarefa/', cors(), async(request, response, next) => {
+app.get('/v2/lista-de-tarefas/tarefa/', cors(), async(request, response, next) => {
 
     let tarefa = request.query.idTarefa
     let usuario = request.query.idUsuario
@@ -127,7 +128,18 @@ app.get('/v1/lista-de-tarefas/tarefa/', cors(), async(request, response, next) =
 
 })
 
-app.put('/v1/lista-de-tarefas/tarefa/concluir/', cors(), async(request, response, next) => {
+app.get('/v2/lista-de-tarefas/tarefa/privadas', cors(), async(request, response, next) => {
+
+    let usuario = request.query.idUsuario
+
+    let dadosTarefa = await controllerTarefas.getBuscarTarefa(usuario, tarefa)
+
+    response.status(dadosTarefa.status_code)
+    response.json(dadosTarefa)
+
+})
+
+app.put('/v2/lista-de-tarefas/tarefa/concluir/', cors(), async(request, response, next) => {
 
     let tarefa = request.query.idTarefa
     let usuario = request.query.idUsuario
@@ -139,7 +151,7 @@ app.put('/v1/lista-de-tarefas/tarefa/concluir/', cors(), async(request, response
 
 })
 
-app.put('/v1/lista-de-tarefas/tarefa/nao-concluir/', cors(), async(request, response, next) => {
+app.put('/v2/lista-de-tarefas/tarefa/nao-concluir/', cors(), async(request, response, next) => {
 
     let tarefa = request.query.idTarefa
     let usuario = request.query.idUsuario
@@ -151,7 +163,7 @@ app.put('/v1/lista-de-tarefas/tarefa/nao-concluir/', cors(), async(request, resp
 
 })
 
-app.put('/v1/lista-de-tarefas/tarefa/atualizar/', cors(), bodyParserJSON, async(request, response, next) => {
+app.put('/v2/lista-de-tarefas/tarefa/atualizar/', cors(), bodyParserJSON, async(request, response, next) => {
 
     let tarefa = request.query.idTarefa
     let usuario = request.query.idUsuario
@@ -164,7 +176,7 @@ app.put('/v1/lista-de-tarefas/tarefa/atualizar/', cors(), bodyParserJSON, async(
 
 })
 
-app.delete('/v1/lista-de-tarefas/tarefa/excluir/', cors(), async(request, response, next) => {
+app.delete('/v2/lista-de-tarefas/tarefa/excluir/', cors(), async(request, response, next) => {
 
     let tarefa = request.query.idTarefa
     let usuario = request.query.idUsuario
@@ -176,7 +188,7 @@ app.delete('/v1/lista-de-tarefas/tarefa/excluir/', cors(), async(request, respon
 
 })
 
-app.post('/v1/lista-de-tarefas/criar-tarefa/:id', cors(), bodyParserJSON, async(request, response, next) => {
+app.post('/v2/lista-de-tarefas/criar-tarefa/:id', cors(), bodyParserJSON, async(request, response, next) => {
 
     let tarefa = request.body
     let usuario = request.params.id
@@ -187,5 +199,7 @@ app.post('/v1/lista-de-tarefas/criar-tarefa/:id', cors(), bodyParserJSON, async(
     response.json(dadosTarefa)
 
 })
+
+
 
 app.listen(8080, () => {console.log('Servidor aguardando requisições na porta 8080')})

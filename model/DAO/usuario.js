@@ -58,6 +58,38 @@ const selectUserByID = async(id) => {
 
 }
 
+const selectTipoConta = async(id) => {
+
+    try {
+        
+        let sql = `select premium from tbl_usuarios where id = ${id}`
+        let rsUsuarios = await prisma.$queryRawUnsafe(sql)
+        return rsUsuarios
+
+    } catch (error) {
+        
+        return false
+
+    }
+
+}
+
+const updateContaPremiumT = async(id) => {
+
+    try {
+        
+        let sql = `update tbl_usuarios set premium = true where id=2`
+        let rsUsuarios = await prisma.$queryRawUnsafe(sql)
+        return rsUsuarios
+
+    } catch (error) {
+        
+        return false
+
+    }
+
+}
+
 const updateUser = async(usuario) => {
 
     try {
